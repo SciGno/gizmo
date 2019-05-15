@@ -465,6 +465,23 @@ func (b *Traversal) To(s string) *Traversal {
 	return b
 }
 
+// Next  step is a terminal step. It returns the next number of steps, based on a supplied integer value.
+func (b *Traversal) Next(i ...int) *Traversal {
+	if len(i) > 0 {
+		b.value = b.value + "next(" + strconv.Itoa(i[0]) + ")."
+	} else {
+		b.value = b.value + "next()."
+	}
+	return b
+}
+
+// HasNext step is a terminal step. It determines whether or not there are available results from a traversal,
+// returning a Boolean value of true or false.
+func (b *Traversal) HasNext() *Traversal {
+	b.value = b.value + "hasNext()."
+	return b
+}
+
 // Emit step is a step modulator, a helper step for another Traversal step.
 // Its main use is to emit either incoming Traversals before a repeat() step, or emit outgoing Traversals after a repeat() step.
 // The emission sends a copy of the current objects to the next step in the query.
@@ -519,13 +536,25 @@ func (b *Traversal) TernaryOp(condition interface{}, v1 interface{}, v2 interfac
 		v2 = "'" + v2.(string) + "'"
 	}
 
-	b.value = b.value + fmt.Sprintf("%v : %v ? %v", condition, v1, v2)
+	b.value = b.value + fmt.Sprintf("%v ? %v : %v", condition, v1, v2)
 	return b
 }
 
 // Raw function is a helper function that can used in case a step is not supported
 // or not available in this package. the string is appended as is without modification
 func (b *Traversal) Raw(s string) *Traversal {
-	b.value = b.value + s + "."
+	b.value = b.value + s
+	return b
+}
+
+// Append function adds the provided string to the end of the traversal query.
+func (b *Traversal) Append(s string) *Traversal {
+	b.value = b.value + s
+	return b
+}
+
+// AddLine function adds a new line with the provided string to the traversal query.
+func (b *Traversal) AddLine(s string) *Traversal {
+	b.value = b.value + "\n" + s + "."
 	return b
 }

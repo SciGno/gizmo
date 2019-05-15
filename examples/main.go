@@ -56,10 +56,15 @@ type Result []struct {
 func main() {
 
 	graph := gizmo.Graph()
-	graph.Raw("tx().config().optoin('allow', true).open()")
 	g := graph.Traversal("g")
-	g.Raw("V().addV('other').flatMap(__.in('includedIn')).V().in('other')")
-	logger.Info(graph)
+
+	n := g.New().Raw("t=").Append(g.New("g").V().Has("user", "username", "scigno").String())
+	n.AddLine(g.New().TernaryOp(
+		g.New("t").HasNext(),
+		g.New("t").Next(),
+		g.New("g").AddV("user").Property("userId", "asfsadfasdfasdf").Property("username", "scigno").Next(),
+	).String())
+	logger.Info(n)
 	logger.Info(g)
 
 	os.Exit(0)
