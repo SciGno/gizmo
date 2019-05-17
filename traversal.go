@@ -14,14 +14,19 @@ type Traversal struct {
 // GraphTraversal function
 func graphTraversal(name ...string) *Traversal {
 	if len(name) == 0 {
-		return &Traversal{""}
+		return &Traversal{"g."}
+	} else if name[0] == "" {
+		return &Traversal{"g."}
 	}
 	return &Traversal{name[0] + "."}
 }
 
 // New function
 func (b *Traversal) New(name ...string) *Traversal {
-	return graphTraversal(name...)
+	if len(name) == 0 {
+		return &Traversal{""}
+	}
+	return &Traversal{name[0] + "."}
 }
 
 // String function

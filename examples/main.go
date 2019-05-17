@@ -1,11 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/scigno/gizmo"
-
-	"stagezero.com/leandro/marketbin/logger"
 )
 
 // Result struct
@@ -62,10 +61,10 @@ func main() {
 	n.AddLine(g.New().TernaryOp(
 		g.New("t").HasNext(),
 		g.New("t").Next(),
-		g.New("g").AddV("user").Property("userId", "asfsadfasdfasdf").Property("username", "scigno").Next(),
+		g.New("g").AddV("user").Property("userId", "744be509-a1cc-466d-bb10-0bb9a376da2e").Property("username", "scigno").Next(),
 	).String())
-	logger.Info(n)
-	logger.Info(g)
+	fmt.Println(n)
+	fmt.Println(g)
 
 	os.Exit(0)
 
