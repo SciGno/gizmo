@@ -14,16 +14,6 @@ const (
 	GRAPHML = "graphml()"
 )
 
-// SomeStruct struct
-type SomeStruct struct {
-	value string
-}
-
-// MyStruct function
-func MyStruct() *SomeStruct {
-	return &SomeStruct{"graph."}
-}
-
 // GraphAPI struct
 type GraphAPI struct {
 	value string
