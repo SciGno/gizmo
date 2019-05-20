@@ -20,4 +20,5 @@ func main() {
 		g.New("g").AddV("user").Property("userId", "744be509-a1cc-466d-bb10-0bb9a376da2e").Property("username", "scigno").Next(),
 	))
 	fmt.Println(n)
+
 }
