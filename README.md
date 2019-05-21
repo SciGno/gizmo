@@ -1,5 +1,5 @@
 # gizmo
-Gremlin language builder for Go.
+Gremlin language query builder for Go.
 
 This is a work in progress for now.  At the moment, this package can only be used for generating Gemlin query strings.
 #
