@@ -36,6 +36,12 @@ func FlatMap(i interface{}) *Traversal {
 	return t.FlatMap(i)
 }
 
+// Filter step is a general step. Map the traverser to either true or false, where false will not pass the traverser to the next step.
+func Filter(i interface{}) *Traversal {
+	t := graphTraversal("")
+	return t.Filter(i)
+}
+
 // AddE is a map/sideEffect. An edge is added from a Traversal g using addE between two existing vertices.
 // A previously created edge label must be specified.
 func AddE(s string) *Traversal {
@@ -47,6 +53,12 @@ func AddE(s string) *Traversal {
 func Property(k interface{}, v interface{}) *Traversal {
 	t := graphTraversal("")
 	return t.Property(k, v)
+}
+
+// Properties step retrieves the properties of the specified element.
+func Properties(name ...string) *Traversal {
+	t := graphTraversal("")
+	return t.Properties(name...)
 }
 
 // Limit returns a new gremlin Traversal
@@ -67,6 +79,12 @@ func ValueMap() *Traversal {
 	return t.ValueMap()
 }
 
+// Label step is a map step that extracts the specified labels.
+func Label() *Traversal {
+	t := graphTraversal("")
+	return t.Label()
+}
+
 // Dedup returns a new gremlin Traversal
 func Dedup() *Traversal {
 	t := graphTraversal("")
@@ -77,12 +95,6 @@ func Dedup() *Traversal {
 func Read() *Traversal {
 	t := graphTraversal("")
 	return t.Read()
-}
-
-// Iterate returns a new gremlin Traversal
-func Iterate() *Traversal {
-	t := graphTraversal("")
-	return t.Iterate()
 }
 
 // Of returns a new gremlin Traversal
@@ -227,6 +239,24 @@ func Set(s string) *Traversal {
 	return t.Set(s)
 }
 
+// SideEffect step is a general step. Perform some operation on the traverser and pass it to the next step.
+func SideEffect(i interface{}) *Traversal {
+	t := graphTraversal("")
+	return t.SideEffect(i)
+}
+
+// Branch step is a general step. Split the traverser to all the traversals indexed by the M token.
+func Branch(i interface{}) *Traversal {
+	t := graphTraversal("")
+	return t.Branch(i)
+}
+
+// Choose step is a general step.
+func Choose(i interface{}) *Traversal {
+	t := graphTraversal("")
+	return t.Choose(i)
+}
+
 ////////////////
 // Predicates
 ///////////////
@@ -341,19 +371,6 @@ func To(s string) *Traversal {
 	return t.To(s)
 }
 
-// Next  step is a terminal step. It returns the next number of steps, based on a supplied integer value.
-func Next(i ...int) *Traversal {
-	t := graphTraversal("")
-	return t.Next(i...)
-}
-
-// HasNext step is a terminal step. It determines whether or not there are available results from a traversal,
-// returning a Boolean value of true or false.
-func HasNext() *Traversal {
-	t := graphTraversal("")
-	return t.HasNext()
-}
-
 // Emit step is a step modulator, a helper step for another Traversal step.
 // Its main use is to emit either incoming Traversals before a repeat() step, or emit outgoing Traversals after a repeat() step.
 // The emission sends a copy of the current objects to the next step in the query.
@@ -398,4 +415,47 @@ func Append(i interface{}) *Traversal {
 func AddLine(i interface{}) *Traversal {
 	t := graphTraversal("")
 	return t.AddLine(i)
+}
+
+////////////////////////
+// Terminal steps
+////////////////////////
+
+// Next  step is a terminal step. It returns the next number of steps, based on a supplied integer value.
+func Next(i ...int) *Traversal {
+	t := graphTraversal("")
+	return t.Next(i...)
+}
+
+// HasNext step is a terminal step. It determines whether or not there are available results from a traversal,
+// returning a Boolean value of true or false.
+func HasNext() *Traversal {
+	t := graphTraversal("")
+	return t.HasNext()
+}
+
+// ToList will return all results in a list.
+func ToList() *Traversal {
+	t := graphTraversal("")
+	return t.ToList()
+}
+
+// ToSet will return all results in a set and thus, duplicates removed.
+func ToSet() *Traversal {
+	t := graphTraversal("")
+	return t.ToSet()
+}
+
+// ToBulkSet will return all results in a weighted set and thus, duplicates preserved via weighting
+func ToBulkSet() *Traversal {
+	t := graphTraversal("")
+	return t.ToBulkSet()
+}
+
+// Iterate does not exactly fit the definition of a terminal step in that it doesn’t return a result,
+// but still returns a traversal - it does however behave as a terminal step in that it iterates
+// the traversal and generates side effects without returning the actual result.
+func Iterate() *Traversal {
+	t := graphTraversal("")
+	return t.Iterate()
 }

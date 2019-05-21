@@ -58,6 +58,26 @@ func (t *Traversal) FlatMap(i interface{}) *Traversal {
 	return processInterface("flatMap", t, i)
 }
 
+// Filter step is a general step. Map the traverser to either true or false, where false will not pass the traverser to the next step.
+func (t *Traversal) Filter(i interface{}) *Traversal {
+	return processInterface("filter", t, i)
+}
+
+// Branch step is a general step. Split the traverser to all the traversals indexed by the M token.
+func (t *Traversal) Branch(i interface{}) *Traversal {
+	return processInterface("branch", t, i)
+}
+
+// Choose step is a general step.
+func (t *Traversal) Choose(i interface{}) *Traversal {
+	return processInterface("choose", t, i)
+}
+
+// SideEffect step is a general step. Perform some operation on the traverser and pass it to the next step.
+func (t *Traversal) SideEffect(i interface{}) *Traversal {
+	return processInterface("sideEffect", t, i)
+}
+
 // AddE is a map/sideEffect. An edge is added from a Traversal g using addE between two existing vertices.
 // A previously created edge label must be specified.
 func (t *Traversal) AddE(s string) *Traversal {
@@ -67,6 +87,11 @@ func (t *Traversal) AddE(s string) *Traversal {
 // Property step in a traversal has the same beahviour as in the Graph API
 func (t *Traversal) Property(k interface{}, v interface{}) *Traversal {
 	return processKeyVakues("property", k, v, t)
+}
+
+// Properties step retrieves the properties of the specified element.
+func (t *Traversal) Properties(name ...string) *Traversal {
+	return processStringSlice("properties", t, name...)
 }
 
 // Limit returns a new gremlin Traversal
@@ -84,6 +109,11 @@ func (t *Traversal) ValueMap() *Traversal {
 	return process("valueMap", t)
 }
 
+// Label step is a map step that extracts the specified labels.
+func (t *Traversal) Label() *Traversal {
+	return process("label", t)
+}
+
 // Dedup returns a new gremlin Traversal
 func (t *Traversal) Dedup() *Traversal {
 	return process("dedup", t)
@@ -92,11 +122,6 @@ func (t *Traversal) Dedup() *Traversal {
 // Read returns a new gremlin Traversal
 func (t *Traversal) Read() *Traversal {
 	return process("read", t)
-}
-
-// Iterate returns a new gremlin Traversal
-func (t *Traversal) Iterate() *Traversal {
-	return process("iterate", t)
 }
 
 // Of returns a new gremlin Traversal
@@ -316,17 +341,6 @@ func (t *Traversal) To(s string) *Traversal {
 	return processString("to", t, s)
 }
 
-// Next  step is a terminal step. It returns the next number of steps, based on a supplied integer value.
-func (t *Traversal) Next(i ...int) *Traversal {
-	return processIntSlice("next", t, i...)
-}
-
-// HasNext step is a terminal step. It determines whether or not there are available results from a traversal,
-// returning a Boolean value of true or false.
-func (t *Traversal) HasNext() *Traversal {
-	return process("hasNext", t)
-}
-
 // Emit step is a step modulator, a helper step for another Traversal step.
 // Its main use is to emit either incoming Traversals before a repeat() step, or emit outgoing Traversals after a repeat() step.
 // The emission sends a copy of the current objects to the next step in the query.
@@ -340,4 +354,41 @@ func (t *Traversal) Emit(i ...interface{}) *Traversal {
 // A predicate or Traversal can be used in an until() step to cause the loop to complete only if the predicate or Traversal is true.
 func (t *Traversal) Until(i ...interface{}) *Traversal {
 	return processInterfaceOptionalSlice("until", t, i)
+}
+
+////////////////////////
+// Terminal steps
+////////////////////////
+
+// Next  step is a terminal step. It returns the next number of steps, based on a supplied integer value.
+func (t *Traversal) Next(i ...int) *Traversal {
+	return processIntSlice("next", t, i...)
+}
+
+// HasNext step is a terminal step. It determines whether or not there are available results from a traversal,
+// returning a Boolean value of true or false.
+func (t *Traversal) HasNext() *Traversal {
+	return process("hasNext", t)
+}
+
+// ToList will return all results in a list.
+func (t *Traversal) ToList() *Traversal {
+	return process("toList", t)
+}
+
+// ToSet will return all results in a set and thus, duplicates removed.
+func (t *Traversal) ToSet() *Traversal {
+	return process("toSet", t)
+}
+
+// ToBulkSet will return all results in a weighted set and thus, duplicates preserved via weighting
+func (t *Traversal) ToBulkSet() *Traversal {
+	return process("toBulkSet", t)
+}
+
+// Iterate does not exactly fit the definition of a terminal step in that it doesn’t return a result,
+// but still returns a traversal - it does however behave as a terminal step in that it iterates
+// the traversal and generates side effects without returning the actual result.
+func (t *Traversal) Iterate() *Traversal {
+	return process("iterate", t)
 }
