@@ -5,7 +5,7 @@ import (
 )
 
 // V function
-func V(name ...string) *Traversal {
+func V(name ...interface{}) *Traversal {
 	t := graphTraversal("")
 	return t.V(name...)
 }
@@ -15,6 +15,20 @@ func V(name ...string) *Traversal {
 func AddV(name ...string) *Traversal {
 	t := graphTraversal("")
 	return t.AddV(name...)
+}
+
+// Project step is a map step that projects the current object into a map keyed by provided labels.
+// It is similar to select() step.
+func Project(name ...string) *Traversal {
+	t := graphTraversal("")
+	return t.Project(name...)
+}
+
+// Select step is a map step that selects labeled steps designated with as() steps.
+// This step is typically used to select particular properties from objects earlier in the traversal.
+func Select(name ...string) *Traversal {
+	t := graphTraversal("")
+	return t.Select(name...)
 }
 
 // Where returns a new gremlin Traversal
@@ -67,7 +81,10 @@ func Limit(i int) *Traversal {
 	return t.Limit(i)
 }
 
-// Aggregate returns a new gremlin Traversal
+// Aggregate step (sideEffect) is used to aggregate all the objects at a particular point of traversal
+// into a Collection. The step uses eager evaluation in that no objects continue on until
+// all previous objects have been fully aggregated (as opposed to store() which lazily fills a collection).
+// The eager evaluation nature is crucial in situations where everything at a particular point is required for future computation.
 func Aggregate(s string) *Traversal {
 	t := graphTraversal("")
 	return t.Aggregate(s)
@@ -77,6 +94,12 @@ func Aggregate(s string) *Traversal {
 func ValueMap() *Traversal {
 	t := graphTraversal("")
 	return t.ValueMap()
+}
+
+// Order step is a map step that sorts returned objects given a certain criteria.
+func Order() *Traversal {
+	t := graphTraversal("")
+	return t.Order()
 }
 
 // Label step is a map step that extracts the specified labels.
@@ -103,10 +126,19 @@ func Of() *Traversal {
 	return t.Of()
 }
 
-// Fold returns a new gremlin Traversal
+// Fold There are situations when the traversal stream needs a "barrier" to aggregate all the objects
+// and emit a computation that is a function of the aggregate. The fold()-step (map) is one particular instance of this.
+// Please see unfold()-step for the inverse functionality.
 func Fold() *Traversal {
 	t := graphTraversal("")
 	return t.Fold()
+}
+
+// Unfold If the object reaching unfold() (flatMap) is an iterator, iterable, or map, then it is unrolled into a linear form.
+// If not, then the object is simply emitted. Please see fold() step for the inverse behavior.
+func Unfold() *Traversal {
+	t := graphTraversal("")
+	return t.Unfold()
 }
 
 // GroupCount returns a new gremlin Traversal
@@ -134,9 +166,15 @@ func Out(name ...string) *Traversal {
 
 // Has step is a filter step. It is the most common step used for graph Traversals,
 // since this step narrows the query to find particular vertices or edges with certain property values.
-func Has(name string, values ...string) *Traversal {
+func Has(name string, values ...interface{}) *Traversal {
 	t := graphTraversal("")
 	return t.Has(name, values...)
+}
+
+// HasLabel step is a filter step.
+func HasLabel(values ...string) *Traversal {
+	t := graphTraversal("")
+	return t.HasLabel(values...)
 }
 
 // OutE step moves the Traversal to the outgoing incident edges, given the edge labels.
@@ -252,9 +290,15 @@ func Branch(i interface{}) *Traversal {
 }
 
 // Choose step is a general step.
-func Choose(i interface{}) *Traversal {
+func Choose(i ...interface{}) *Traversal {
 	t := graphTraversal("")
-	return t.Choose(i)
+	return t.Choose(i...)
+}
+
+// Coalesce step evaluates the provided traversals in order and returns the first traversal that emits at least one element..
+func Coalesce(i ...interface{}) *Traversal {
+	t := graphTraversal("")
+	return t.Coalesce(i...)
 }
 
 ////////////////
@@ -366,7 +410,7 @@ func Times(n int) *Traversal {
 }
 
 // To returns a new gremlin Traversal
-func To(s string) *Traversal {
+func To(s interface{}) *Traversal {
 	t := graphTraversal("")
 	return t.To(s)
 }
@@ -388,6 +432,12 @@ func Until(i ...interface{}) *Traversal {
 	return t.Until(i...)
 }
 
+// Values step is a map step that extracts the values of either all the properties or specified properties for an element.
+func Values(s ...string) *Traversal {
+	t := graphTraversal("")
+	return t.Values(s...)
+}
+
 //////////////////
 // Other Helpers
 /////////////////
@@ -399,10 +449,10 @@ func TernaryOp(condition interface{}, v1 interface{}, v2 interface{}) *Traversal
 }
 
 // Raw function is a helper function that can used in case a step is not supported
-// or not available in this package. the string is appended as is without modification
+// or not available in this package. The string is appended to the end as is without modification
 func Raw(s string) *Traversal {
 	t := graphTraversal("")
-	return t
+	return t.Raw(s)
 }
 
 // Append function adds the provided string to the end of the traversal query.

@@ -1,5 +1,8 @@
 package gizmo
 
+// Vars type represents a traversal variable
+type Vars string
+
 // Traversal struct
 type Traversal struct {
 	value string
@@ -32,14 +35,26 @@ func (t *Traversal) String() string {
 }
 
 // V function
-func (t *Traversal) V(name ...string) *Traversal {
-	return processStringSlice("V", t, name...)
+func (t *Traversal) V(name ...interface{}) *Traversal {
+	return processZerOrMoreInterfaces("V", t, name...)
 }
 
 // AddV step is a map/sideEffect. A vertex is added from a Traversal g using addV.
 // A previously created vertex label must be specified. Property key-value pairs may be optionally specified.
 func (t *Traversal) AddV(name ...string) *Traversal {
 	return processStringSlice("addV", t, name...)
+}
+
+// Project step is a map step that projects the current object into a map keyed by provided labels.
+// It is similar to select() step.
+func (t *Traversal) Project(name ...string) *Traversal {
+	return processStringSlice("project", t, name...)
+}
+
+// Select step is a map step that selects labeled steps designated with as() steps.
+// This step is typically used to select particular properties from objects earlier in the traversal.
+func (t *Traversal) Select(name ...string) *Traversal {
+	return processStringSlice("select", t, name...)
 }
 
 // Where returns a new gremlin Traversal
@@ -68,9 +83,14 @@ func (t *Traversal) Branch(i interface{}) *Traversal {
 	return processInterface("branch", t, i)
 }
 
-// Choose step is a general step.
-func (t *Traversal) Choose(i interface{}) *Traversal {
-	return processInterface("choose", t, i)
+// Choose step is a branch step that can be used to route a traverser to a particular traversal branch, similar to if-then-else logic.
+func (t *Traversal) Choose(i ...interface{}) *Traversal {
+	return processInterfaceSlice("choose", t, i...)
+}
+
+// Coalesce step evaluates the provided traversals in order and returns the first traversal that emits at least one element..
+func (t *Traversal) Coalesce(i ...interface{}) *Traversal {
+	return processInterfaceSlice("coalesce", t, i...)
 }
 
 // SideEffect step is a general step. Perform some operation on the traverser and pass it to the next step.
@@ -99,7 +119,10 @@ func (t *Traversal) Limit(i int) *Traversal {
 	return processInt("limit", t, i)
 }
 
-// Aggregate returns a new gremlin Traversal
+// Aggregate step (sideEffect) is used to aggregate all the objects at a particular point of traversal
+// into a Collection. The step uses eager evaluation in that no objects continue on until
+// all previous objects have been fully aggregated (as opposed to store() which lazily fills a collection).
+// The eager evaluation nature is crucial in situations where everything at a particular point is required for future computation.
 func (t *Traversal) Aggregate(s string) *Traversal {
 	return processString("aggregate", t, s)
 }
@@ -107,6 +130,21 @@ func (t *Traversal) Aggregate(s string) *Traversal {
 // ValueMap The valueMap() step yields a map representation of the properties of an element.
 func (t *Traversal) ValueMap() *Traversal {
 	return process("valueMap", t)
+}
+
+// Order step is a map step that sorts returned objects given a certain criteria.
+func (t *Traversal) Order() *Traversal {
+	return process("order", t)
+}
+
+// Value The valueMap() step yields a map representation of the properties of an element.
+func (t *Traversal) Value() *Traversal {
+	return process("value", t)
+}
+
+// Values step is a map step that extracts the values of either all the properties or specified properties for an element.
+func (t *Traversal) Values(s ...string) *Traversal {
+	return processStringSlice("values", t, s...)
 }
 
 // Label step is a map step that extracts the specified labels.
@@ -124,14 +162,27 @@ func (t *Traversal) Read() *Traversal {
 	return process("read", t)
 }
 
+// Count returns a new gremlin Traversal
+func (t *Traversal) Count() *Traversal {
+	return process("count", t)
+}
+
 // Of returns a new gremlin Traversal
 func (t *Traversal) Of() *Traversal {
 	return process("of", t)
 }
 
-// Fold returns a new gremlin Traversal
+// Fold There are situations when the traversal stream needs a "barrier" to aggregate all the objects
+// and emit a computation that is a function of the aggregate. The fold()-step (map) is one particular instance of this.
+// Please see unfold()-step for the inverse functionality.
 func (t *Traversal) Fold() *Traversal {
 	return process("fold", t)
+}
+
+// Unfold If the object reaching unfold() (flatMap) is an iterator, iterable, or map, then it is unrolled into a linear form.
+// If not, then the object is simply emitted. Please see fold() step for the inverse behavior.
+func (t *Traversal) Unfold() *Traversal {
+	return process("unfold", t)
 }
 
 // GroupCount returns a new gremlin Traversal
@@ -156,8 +207,14 @@ func (t *Traversal) Out(name ...string) *Traversal {
 
 // Has step is a filter step. It is the most common step used for graph Traversals,
 // since this step narrows the query to find particular vertices or edges with certain property values.
-func (t *Traversal) Has(name string, values ...string) *Traversal {
-	return processStringAndStringSlice("has", t, name, values...)
+func (t *Traversal) Has(name string, values ...interface{}) *Traversal {
+	// return processStringAndStringSlice("has", t, name, values...)
+	return processStringAndInterfaceSlice("has", t, name, values...)
+}
+
+// HasLabel step is a filter step.
+func (t *Traversal) HasLabel(labels ...string) *Traversal {
+	return processStringSlice("hasLabel", t, labels...)
 }
 
 // OutE step moves the Traversal to the outgoing incident edges, given the edge labels.
@@ -337,8 +394,8 @@ func (t *Traversal) Times(n int) *Traversal {
 }
 
 // To returns a new gremlin Traversal
-func (t *Traversal) To(s string) *Traversal {
-	return processString("to", t, s)
+func (t *Traversal) To(s interface{}) *Traversal {
+	return processInterface("to", t, s)
 }
 
 // Emit step is a step modulator, a helper step for another Traversal step.

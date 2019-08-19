@@ -26,11 +26,6 @@ func Benchmark_Graph(b *testing.B) {
 		Graph()
 	}
 }
-func Benchmark_MyStruct(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		MyStruct()
-	}
-}
 
 func TestGraphAPI_String(t *testing.T) {
 	type fields struct {
