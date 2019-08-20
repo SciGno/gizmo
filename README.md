@@ -1,7 +1,7 @@
 # gizmo
 Gremlin language query builder for Go.
 
-This is a work in progress for now.  At the moment, this package can only be used for generating Gemlin query strings.
+This is a work in progress for now.  At the moment, this package can only be used for generating Gremlin query strings.
 #
 ### The Logic
 #### Let me know if the package is missing any Traversal steps.  Which I'm sure it is.
@@ -68,9 +68,9 @@ g.New("g").AddV("user")...	# returns g.addV('user')...
 Finally
 
 ```groovy
-compundQuery.Append(getUser).AddLine(newQuery)
+compoundQuery.Append(getUser).AddLine(newQuery)
 ```
-The Append and NewLine are also package helpers which do just what they say.  Append, appends the 'getUser' Traversal to the end of  compoundQuery and the NewLine adds a new line and then the 'newQuery' Traversal.
+The Append and NewLine are also package helpers which do just what they say.  Append, appends the 'getUser' Traversal to the end of compoundQuery and the NewLine adds a new line and then the 'newQuery' Traversal.
 
 
 #
@@ -91,15 +91,15 @@ func main() {
 
 	graph := gizmo.Graph()
 	g := graph.Traversal("g")
-	compundQuery := g.New()
+	compoundQuery := g.New()
 	getUser := g.New().Raw("t=").Append(g.New("g").V().Has("user", "username", "scigno"))
 	newQuery := g.New().TernaryOp(
 		g.New("t").HasNext(),
 		g.New("t").Next(),
 		g.New("g").AddV("user").Property("userId", "744be509-a1cc-466d-bb10-0bb9a376da2e").Property("username", "scigno").Next(),
 	)
-	compundQuery.Append(getUser).AddLine(newQuery)
-	fmt.Println(compundQuery)
+	compoundQuery.Append(getUser).AddLine(newQuery)
+	fmt.Println(compoundQuery)
 }
 ```
 
