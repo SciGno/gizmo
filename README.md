@@ -102,5 +102,5 @@ g.V().has('user', 'userId', '1968410f-a76c-4827-a0cc-4126dcd95590').
 You can find more examples in the example folder.
 
 ## TODO
-- Incorporate the ability to use a Gremlin laguage driver.
+- Incorporate the ability to use a Gremlin language driver.
   
