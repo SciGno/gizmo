@@ -1,13 +1,21 @@
-# gizmo
+<h1 align="left">Gizmo</h1>
+
 Gremlin language query builder for Go.
 
 This is a work in progress for now.  At the moment, this package can only be used for generating Gremlin query strings.
-#
-### The Logic
+## The Logic
+---
 #### Let me know if the package is missing any Traversal steps.  Which I'm sure it is.
 The basic idea is to have a starting point for a gremlin query and then append a sequence of steps to the end.
-#
-### The Process
+
+## Installation
+---
+```
+go get github.com/scigno/gizmo
+```
+
+## Getting started
+---
 Lets say that we have a query like this:
 ```groovy
 g.V().hasLabel('user')
@@ -95,3 +103,8 @@ g.V().has('user', 'userId', '1968410f-a76c-4827-a0cc-4126dcd95590').
 ```
 
 You can find more examples in the example folder.
+
+## TODO
+---
+- Incorporate the ability to use a Gremlin laguage driver.
+  
