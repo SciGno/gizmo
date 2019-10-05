@@ -5,106 +5,93 @@ This is a work in progress for now.  At the moment, this package can only be use
 #
 ### The Logic
 #### Let me know if the package is missing any Traversal steps.  Which I'm sure it is.
-The idea is to have a starting poin and then append a step, line, etc. to the end of the query.
-
+The basic idea is to have a starting point for a gremlin query and then append a sequence of steps to the end.
+#
+### The Process
 Lets say that we have a query like this:
 ```groovy
-g.V().out('created').hasNext()
+g.V().hasLabel('user')
 ```
-The query has as a starting point the character 'g'.  Then, V() is appended, then out('created') and finally hasNext().
-There are two ways to start a query in the package:
-First:
-```groovy
-graph := gizmo.Graph()
-g := graph.Traversal("g")
-```
-Second. Once we have a Graph object and a Traversal, we can use the Traversal object to return a brand new
-```groovy
-g.New("g")	# This returns a Traversal with g as the starting point
-g.New()		# This returns a Travertsal with an empty starting point.
-g.New("__")	# This returns a Travertsal with "__" as the starting point.
-```
-Now that we know how to begin the query, we can make more complex ones.
-Here are some examples.
+The query has as a starting point the character 'g'.  Then, V() is appended, then finally hasLabel('user').
+There are two ways to start a query:
 
 ```groovy
-graph := gizmo.Graph()
+g := gizmo.NewGraph()
+or
+g := gizmo.G()
 ```
-We create a Graph object
+This results in a Traversal that has 'g' as the start/head of the query.
+
+Now that we know how to start the query, we can continue with the rest of the query
+```groovy
+g.V().HasLabel("user)
+```
+
+You can also pass a parameter.
 
 ```groovy
-g := graph.Traversal("g")
+g := gizmo.NewGraph("x")
+or
+g := gizmo.G("x")
+```
+Which results in a Traversal that begins with 'x'.  The character 'g' is the default when a parameter is ommitted.
+
+
+Now for a more complex example.  Let's say we want to create the query bellow.
+
+We want to create a vertex 'product' for for a particular user if it does not exist, then create an edge from the user to the product.  But if the product exists, return the product vertex.
+```groovy
+g.V().has('product', 'productName', 'camera').fold().
+coalesce(
+	unfold(), 
+	addV('product').
+		property('productName', 'camera').
+		property('createdBy', '12345').
+		property('modifiedBy', '12345').
+		property('createdOn', 1570288181201).
+		property('modifiedOn', 1570288181201).
+		as('p').project('p').
+		V().has('user', 'userId', '12345').as('u').
+		addE('has').from('u').to('p').
+		select('p'))
 ```
 The Graph object generates a new Traversal with a starting point of 'g'
 
 ```groovy
-compundQuery := g.New()	
-```
-We create an empty Traversal where we are later going to join all the other queries
-
-```groovy
-getUser := g.New().Raw("t=").Append(g.New("g").V().Has("user", "username", "scigno"))
-```
-This is a more complex query. We create a new query and append a Raw("t=") to start the query.  
-
-if we were to create a g.New("t="), the query would begin with 't=." since the traversal adds a '.' between each function.
-
-```groovy
-newQuery := g.New().TernaryOp(
-	g.New("t").HasNext(),
-	g.New("t").Next(),
-	g.New("g").AddV("user").Property("userId", "744be509-a1cc-466d-bb10-0bb9a376da2e").Property("username", "scigno").Next(),
-)
-```
-The TernaryOp function is not a Gremlin step, but a helper step to allow ternary compsitions in the package. Which contains the following arguments:
-
-```groovy
-g.New("t").HasNext() 		# returns t.hasNext()
-
-g.New("t").Next()		# returns t.Next()
-
-g.New("g").AddV("user")...	# returns g.addV('user')...
-```
-Finally
-
-```groovy
-compoundQuery.Append(getUser).AddLine(newQuery)
-```
-The Append and NewLine are also package helpers which do just what they say.  Append, appends the 'getUser' Traversal to the end of compoundQuery and the NewLine adds a new line and then the 'newQuery' Traversal.
-
-
-#
-
-### The full example source:
-
-```go
-package main
-
-import (
-	"fmt"
-	"os"
-
-	"github.com/scigno/gizmo"
-)
-
-func main() {
-
-	graph := gizmo.Graph()
-	g := graph.Traversal("g")
-	compoundQuery := g.New()
-	getUser := g.New().Raw("t=").Append(g.New("g").V().Has("user", "username", "scigno"))
-	newQuery := g.New().TernaryOp(
-		g.New("t").HasNext(),
-		g.New("t").Next(),
-		g.New("g").AddV("user").Property("userId", "744be509-a1cc-466d-bb10-0bb9a376da2e").Property("username", "scigno").Next(),
+g := gizmo.NewGraph()
+g.V().Has("product", "productName", "camera").Fold().
+	Coalesce(
+		gizmo.Unfold(),
+		gizmo.AddV("product").
+			Property("productName", "camera").
+			Property("createdBy", "12345").
+			Property("modifiedBy", "12345").
+			Property("createdOn", time.Now().UnixNano()/1000000).
+			Property("modifiedOn", time.Now().UnixNano()/1000000).
+			As("p").Project("p").
+			V().Has("user", "userId", "12345").As("u").
+			AddE("has").From("u").To("p").
+			Select("p"),
 	)
-	compoundQuery.Append(getUser).AddLine(newQuery)
-	fmt.Println(compoundQuery)
-}
 ```
 
-Output:
-```bash
-t=g.V().has('user','username','scigno') 
-t.hasNext() ? t.next() : g.addV('user').property('userId', '744be509-a1cc-466d-bb10-0bb9a376da2e').property('username', 'scigno').next()
+In this other example, we can separate the quey in two steps since the steps are always added to the end of the Traversal
+
+```groovy
+vals := []string{"one", "two"}
+ids := []float32{1, 2}
+g := gizmo.G()
+g.V().Has("user", "userId", "1968410f-a76c-4827-a0cc-4126dcd95590").
+	OutE("has").InV().HasLabel("attribute").Order().By("name")
+g.Or(gizmo.Has("values", gizmo.Within(vals)), gizmo.Has("ids", gizmo.Within(ids)))
 ```
+This results in the following query
+
+```groovy
+g.V().has('user', 'userId', '1968410f-a76c-4827-a0cc-4126dcd95590').
+	outE('has').inV().hasLabel('attribute').order().by('name').
+	or(has('values', within('one', 'two')), has('ids', within(1, 2)))
+)
+```
+
+You can find more examples in the example folder.

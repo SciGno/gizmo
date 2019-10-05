@@ -34,11 +34,11 @@ func (g *GraphAPI) String() string {
 	return g.value
 }
 
-// Traversal function
-func (g *GraphAPI) Traversal(name ...string) *Traversal {
-	tmp := graphTraversal(name...)
-	return tmp
-}
+// // Traversal function
+// func (g *GraphAPI) Traversal(name ...string) *Traversal {
+// 	tmp := NewTraversal(name...)
+// 	return tmp
+// }
 
 // Property step is a sideEffect. When a vertex is added from a Graph g using addV, properties can be added with property().
 // For a previously created vertex, properties can be added. A previously created vertex label must be specified.

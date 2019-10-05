@@ -9,70 +9,40 @@ import (
 
 func main() {
 
-	// graph := gizmo.Graph()
-	// g := graph.Traversal("g")
-	// compundQuery := g.New()
-	// getUser := g.New().Raw("t=").Append(g.New("g").V().Has("user", "username", "scigno"))
-	// newQuery := g.New().TernaryOp(
-	// 	g.New("t").HasNext(),
-	// 	g.New("t").Next(),
-	// 	g.New("g").AddV("user").Property("userId", "744be509-a1cc-466d-bb10-0bb9a376da2e").Property("username", "scigno").Next(),
-	// )
-	// compundQuery.Append(getUser).AddLine(newQuery)
-	// fmt.Println(compundQuery)
+	fmt.Print("If product for user does not exist, creat it and then create an edge from the user to the product.\nIf product exists, return the product.\n")
+	g := gizmo.NewGraph()
+	g.V().Has("product", "productName", "camera").Fold().
+		Coalesce(
+			gizmo.Unfold(),
+			gizmo.AddV("product").
+				Property("productName", "camera").
+				Property("createdBy", "12345").
+				Property("modifiedBy", "12345").
+				Property("createdOn", time.Now().UnixNano()/1000000).
+				Property("modifiedOn", time.Now().UnixNano()/1000000).
+				As("p").Project("p").
+				V().Has("user", "userId", "12345").As("u").
+				AddE("has").From("u").To("p").
+				Select("p"),
+		)
+	fmt.Print(g.String(), "\n\n")
 
-	graph := gizmo.Graph()
-	g := graph.Traversal("g")
-	query := g.New()
-	getUser := g.New().Raw("u=").Append(g.New("g").V().Has("user", "userId", "7031dc5e-a555-4988-bbae-f9786bb52f61").Next())
-	getToken := g.New().Raw("t=").Append(g.New("g").V().Has("accessToken", "accessTokenId", "7031dc5e-a555-4988-bbae-f9786bb52f61").Next())
-	addEdge := g.New("g").V(g.Var("u")).AddE("has").To(g.Var("t")).Next()
-	addToken := g.New("g").AddV("refreshToken").
-		Property("refreshTokenId", "7031dc5e-a555-4988-bbae-f9786bb52f61").
-		Property("refreshTokenString", "7031dc5e-a555-4988-bbae-f9786bb52f61").
-		Property("createdBy", "7031dc5e-a555-4988-bbae-f9786bb52f61").
-		Property("modifiedBy", "7031dc5e-a555-4988-bbae-f9786bb52f61").
-		Property("createdOn", time.Now().UnixNano()/1000000).
-		Property("modifiedOn", time.Now().UnixNano()/1000000)
-	query.Append(addToken).AddLine(getUser).AddLine(getToken).AddLine(addEdge)
-	fmt.Println(query)
+	g1 := gizmo.NewGraph()
+	g1.V(1).Out().Values("name")
+	fmt.Print(g1.String(), "\n\n")
 
-	g2 := graph.Traversal("g")
-	g2.V(g2.Raw("u").String())
-	fmt.Println(g2)
+	v := gizmo.VAR("t")
+	g2 := gizmo.G()
+	g2.V().AddE("test")
+	fmt.Print(v.String()+g2.String(), "\n\n")
 
-	g4 := graph.Traversal("g")
-	g4.V(g4.New().Raw("u").String())
-	fmt.Println(g4)
+	vals := []string{"one", "two"}
+	ids := []float32{1, 2}
+	g4 := gizmo.G()
+	g4.V().Has("user", "userId", "1968410f-a76c-4827-a0cc-4126dcd95590").OutE("has").InV().HasLabel("attribute").Order().By("name")
+	g4.Or(gizmo.Has("values", gizmo.Within(vals)), gizmo.Has("ids", gizmo.Within(ids)))
+	fmt.Print(g4, "\n\n")
 
-	g3 := graph.Traversal("g")
-	g3.V(g3.Var("u"))
-	fmt.Println(g3)
-
-	g5 := graph.Traversal("g")
-	getFailures := g5.New().Raw("f=").V().Has("user", "username", "llopez").Properties("loginFailures").Next().Value()
-	setFailures := g5.New("g").V().Has("user", "username", "llopez").Property("loginFailures", g5.Var("f+1"))
-	compoundQuery := g5.New().Append(getFailures).AddLine(setFailures)
-	fmt.Println(compoundQuery)
-
-	g6 := graph.Traversal("g")
-	g6.V().Choose(g.New().Values("userId", "username"), g.New().V().Has("user", "username", "scigno"))
-	fmt.Println(g6)
-
-	g7 := graph.Traversal("g")
-	compundQuery := g7.New()
-	gU := g7.New().Raw("t=").Append(g7.New("g").V().Has("user", "username", "llopez"))
-	newQuery := g7.New().TernaryOp(
-		g7.New("t").HasNext(),
-		g7.New("t").Next(),
-		g7.New("g").AddV("user").Property("userId", "7031dc5e-a555-4988-bbae-f9786bb52f61").
-			Property("username", "llopez").
-			Property("password", "llopez").
-			Property("createdBy", "7031dc5e-a555-4988-bbae-f9786bb52f61").
-			Property("modifiedBy", "7031dc5e-a555-4988-bbae-f9786bb52f61").
-			Property("createdOn", time.Now().UnixNano()/1000000).
-			Property("modifiedOn", time.Now().UnixNano()/1000000),
-	)
-	compundQuery.Append(gU).AddLine(newQuery)
-	fmt.Println(compundQuery)
+	g5 := gizmo.G("x")
+	fmt.Print(g5, "\n\n")
 }
