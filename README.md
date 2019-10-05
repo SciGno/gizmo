@@ -44,7 +44,7 @@ Which results in a Traversal that begins with 'x'.  The character 'g' is the def
 
 Now for a more complex example.  Let's say we want to create the query bellow.
 
-We want to create a vertex 'product' for for a particular user if it does not exist, then create an edge from the user to the product.  But if the product exists, return the product vertex.
+We want to create a vertex 'product' for a particular user if it does not exist, then create an edge from the user to the product.  But if the product exists, return the product vertex.
 ```groovy
 g.V().has('product', 'productName', 'camera').fold().
 coalesce(
