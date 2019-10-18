@@ -22,7 +22,6 @@ func Test_step_String(t *testing.T) {
 		fields fields
 		want   string
 	}{
-		// TODO: Add test cases.
 		{"String", fields{"addE", nil, "(", ")", nil, nil, nil}, AddE().String()},
 		{"String", fields{"addE", []interface{}{"edge"}, "(", ")", nil, nil, nil}, AddE("edge").String()},
 		{"String", fields{"g", nil, "", "", nil, AddV("v").(*step), nil}, g.String()},

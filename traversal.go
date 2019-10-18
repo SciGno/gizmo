@@ -23,6 +23,7 @@ type Traversal interface {
 	// CrLf() Traversal
 	Dedup() Traversal
 	Drop() Traversal
+	E(...interface{}) Traversal
 	Emit(...interface{}) Traversal
 	Eq(...interface{}) Traversal
 	Exists() Traversal
@@ -30,8 +31,6 @@ type Traversal interface {
 	Filter(...interface{}) Traversal
 	Fold() Traversal
 	From(...interface{}) Traversal
-	getLastStep() *step  // TODO: remove
-	getFirstStep() *step // TODO: remove
 	Graphs() Traversal
 	Gt(...interface{}) Traversal
 	Gte(...interface{}) Traversal
@@ -115,13 +114,6 @@ func VAL(n string) Traversal {
 	return startStep(n, "", "", nil)
 }
 
-// Append adds step 's' to the end of step 'd'
-// TODO: remove
-func Append(d Traversal, s Traversal) {
-	d.getLastStep().next = s.getFirstStep()
-	d.getFirstStep().tail = s.getFirstStep()
-}
-
 func appendStep(s *step, name string, open string, close string, prev *step, next *step, params ...interface{}) Traversal {
 	st := &step{name, params, open, close, prev, next, nil}
 	st.head = s.head
@@ -141,19 +133,14 @@ func startStep(name string, open string, close string, params ...interface{}) Tr
 	return st
 }
 
-// TODO: remove
-func (s *step) getFirstStep() *step {
-	return s.head
-}
-
-// TODO: remove
-func (s *step) getLastStep() *step {
-	return s.tail
-}
-
 // V function
 func (s *step) V(v ...interface{}) Traversal {
 	return appendStep(s, "V", "(", ")", nil, nil, v...)
+}
+
+// E function
+func (s *step) E(v ...interface{}) Traversal {
+	return appendStep(s, "E", "(", ")", nil, nil, v...)
 }
 
 // AddE is a map/sideEffect. An edge is added from a Traversal g using addE between two existing vertices.

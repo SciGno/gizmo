@@ -95,6 +95,11 @@ func V(v ...interface{}) Traversal {
 	return startStep("V", "(", ")", v...)
 }
 
+// E function
+func E(v ...interface{}) Traversal {
+	return startStep("E", "(", ")", v...)
+}
+
 // AddE is a map/sideEffect. An edge is added from a Traversal g using addE between two existing vertices.
 // A previously created edge label must be specified.
 func AddE(v ...interface{}) Traversal {
